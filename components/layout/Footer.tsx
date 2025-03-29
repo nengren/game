@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { 
-  FacebookIcon, 
+  FacebookSquareIcon, 
   TwitterIcon, 
   InstagramIcon, 
-  YoutubeIcon 
+  PlayIcon 
 } from '@heroicons/react/24/outline';
 
 const Footer = () => {
@@ -31,10 +31,10 @@ const Footer = () => {
   };
 
   const socialLinks = [
-    { name: 'Facebook', icon: FacebookIcon, href: 'https://facebook.com/joygrid' },
+    { name: 'Facebook', icon: FacebookSquareIcon, href: 'https://facebook.com/joygrid' },
     { name: 'Twitter', icon: TwitterIcon, href: 'https://twitter.com/joygrid' },
     { name: 'Instagram', icon: InstagramIcon, href: 'https://instagram.com/joygrid' },
-    { name: 'YouTube', icon: YoutubeIcon, href: 'https://youtube.com/joygrid' },
+    { name: 'YouTube', icon: PlayIcon, href: 'https://youtube.com/joygrid' },
   ];
 
   return (
