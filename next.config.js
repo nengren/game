@@ -2,8 +2,7 @@
 const nextConfig = {
   output: 'export',  // 静态导出
   images: {
-    unoptimized: true,  // Cloudflare Pages不支持Next.js的图像优化
-    domains: ['images.unsplash.com', 'joy-grid.com'],
+    unoptimized: true,  // 静态导出需要禁用图片优化
   },
   trailingSlash: true,  // 确保URL以斜杠结尾
   // 添加构建优化配置
