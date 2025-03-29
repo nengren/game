@@ -1,10 +1,5 @@
 import Link from 'next/link';
-import { 
-  FaFacebookSquare, 
-  FaTwitter, 
-  FaInstagram, 
-  FaYoutube 
-} from 'react-icons/fa';
+import { Icons } from '@/utils/icons';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -31,10 +26,10 @@ const Footer = () => {
   };
 
   const socialLinks = [
-    { name: 'Facebook', icon: FaFacebookSquare, href: 'https://facebook.com/joygrid' },
-    { name: 'Twitter', icon: FaTwitter, href: 'https://twitter.com/joygrid' },
-    { name: 'Instagram', icon: FaInstagram, href: 'https://instagram.com/joygrid' },
-    { name: 'YouTube', icon: FaYoutube, href: 'https://youtube.com/joygrid' },
+    { name: 'Facebook', icon: Icons.Facebook, href: 'https://facebook.com/joygrid' },
+    { name: 'Twitter', icon: Icons.Twitter, href: 'https://twitter.com/joygrid' },
+    { name: 'Instagram', icon: Icons.Instagram, href: 'https://instagram.com/joygrid' },
+    { name: 'YouTube', icon: Icons.Youtube, href: 'https://youtube.com/joygrid' },
   ];
 
   return (
@@ -50,17 +45,20 @@ const Footer = () => {
               你的游戏天堂，随时随地享受精彩游戏体验。
             </p>
             <div className="flex space-x-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <social.icon className="w-6 h-6" />
-                </a>
-              ))}
+              {socialLinks.map((social) => {
+                const Icon = social.icon;
+                return (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <Icon className="w-6 h-6" />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
