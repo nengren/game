@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react';
 import Head from 'next/head';
 import Header from '@/components/layout/Header';
@@ -6,7 +7,7 @@ import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const Home = () => {
+export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const featuredGames = [
@@ -54,62 +55,14 @@ const Home = () => {
 
       <Header />
 
-      <main>
-        {/* 搜索区域 */}
-        <div className="bg-primary py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold text-white mb-4">
-                发现精彩游戏
-              </h1>
-              <div className="max-w-2xl mx-auto">
-                <input
-                  type="text"
-                  placeholder="搜索游戏..."
-                  className="w-full px-4 py-3 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 轮播区域 */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Slider {...sliderSettings}>
-            {featuredGames.map((game) => (
-              <div key={game.id} className="relative h-[400px]">
-                <Image
-                  src={game.image}
-                  alt={game.title}
-                  layout="fill"
-                  objectFit="cover"
-                  className="rounded-lg"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6 rounded-b-lg">
-                  <h2 className="text-2xl font-bold text-white">{game.title}</h2>
-                  <p className="text-white/80">{game.description}</p>
-                </div>
-              </div>
-            ))}
-          </Slider>
-        </div>
-
-        {/* 游戏分类 */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">游戏分类</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer text-center"
-              >
-                <div className="text-4xl mb-2">{category.icon}</div>
-                <div className="text-gray-900 font-medium">{category.name}</div>
-              </div>
-            ))}
-          </div>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Welcome to Joy-Grid
+          </h1>
+          <p className="text-xl text-gray-600">
+            网站正在建设中...
+          </p>
         </div>
       </main>
 
@@ -122,6 +75,4 @@ const Home = () => {
       </footer>
     </div>
   );
-};
-
-export default Home; 
+} 

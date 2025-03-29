@@ -6,10 +6,6 @@ const nextConfig = {
     domains: ['images.unsplash.com', 'joy-grid.com'],
   },
   trailingSlash: true,  // 确保URL以斜杠结尾
-  i18n: {
-    locales: ['zh', 'en'],
-    defaultLocale: 'zh',
-  },
 }
 
 module.exports = nextConfig 
