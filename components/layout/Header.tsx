@@ -1,82 +1,125 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { categories } from '@/data/games';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
 
-  const navigation = [
-    { name: '首页', href: '/' },
-    { name: '游戏分类', href: '/categories' },
-    { name: '热门游戏', href: '/popular' },
-    { name: '新游戏', href: '/new' },
-    { name: '关于我们', href: '/about' },
-  ];
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
-    <header className="bg-white shadow-md">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <Link href="/" className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-bold text-primary">Joy Grid</span>
-            </Link>
-          </div>
+    <header className="navbar">
+      <div className="navbar-content">
+        {/* Logo */}
+        <Link href="/" className="flex items-center space-x-2">
+          <span className="text-2xl font-bold text-primary">Joy Grid</span>
+        </Link>
 
-          {/* 桌面端导航 */}
-          <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`${
-                  router.pathname === item.href
-                    ? 'border-primary text-gray-900'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
-
-          {/* 移动端菜单按钮 */}
-          <div className="flex items-center sm:hidden">
+        {/* 搜索框 */}
+        <form onSubmit={handleSearch} className="hidden md:block flex-1 max-w-xl mx-8">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="搜索游戏..."
+              className="search-input"
+            />
             <button
-              type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              type="submit"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary"
             >
-              {isMenuOpen ? (
-                <XMarkIcon className="block h-6 w-6" />
-              ) : (
-                <Bars3Icon className="block h-6 w-6" />
-              )}
+              <MagnifyingGlassIcon className="w-5 h-5" />
             </button>
           </div>
-        </div>
-      </nav>
+        </form>
+
+        {/* 导航链接 */}
+        <nav className="hidden md:flex items-center space-x-6">
+          <Link href="/popular" className="nav-link">
+            热门游戏
+          </Link>
+          <Link href="/categories" className="nav-link">
+            游戏分类
+          </Link>
+          <Link href="/about" className="nav-link">
+            关于我们
+          </Link>
+          <button className="btn-primary">
+            登录
+          </button>
+        </nav>
+
+        {/* 移动端菜单按钮 */}
+        <button
+          className="md:hidden text-gray-600 hover:text-primary"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          {isMenuOpen ? (
+            <XMarkIcon className="w-6 h-6" />
+          ) : (
+            <Bars3Icon className="w-6 h-6" />
+          )}
+        </button>
+      </div>
 
       {/* 移动端菜单 */}
       {isMenuOpen && (
-        <div className="sm:hidden">
-          <div className="pt-2 pb-3 space-y-1">
-            {navigation.map((item) => (
+        <div className="md:hidden bg-white border-t">
+          <div className="container mx-auto px-4 py-4">
+            <form onSubmit={handleSearch} className="mb-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="搜索游戏..."
+                  className="search-input"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary"
+                >
+                  <MagnifyingGlassIcon className="w-5 h-5" />
+                </button>
+              </div>
+            </form>
+
+            <div className="space-y-4">
               <Link
-                key={item.name}
-                href={item.href}
-                className={`${
-                  router.pathname === item.href
-                    ? 'bg-primary/10 border-primary text-primary'
-                    : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-                } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+                href="/popular"
+                className="block nav-link"
                 onClick={() => setIsMenuOpen(false)}
               >
-                {item.name}
+                热门游戏
               </Link>
-            ))}
+              <Link
+                href="/categories"
+                className="block nav-link"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                游戏分类
+              </Link>
+              <Link
+                href="/about"
+                className="block nav-link"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                关于我们
+              </Link>
+              <button className="btn-primary w-full">
+                登录
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #6C5CE7;
+  --primary-dark: #5B4BC4;
+  --secondary: #00B894;
+  --accent: #FF7675;
+  --background: #F8F9FA;
+  --text: #2D3436;
+  --text-light: #636E72;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-text;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-white px-6 py-2 rounded-lg hover:bg-secondary/90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105;
+  }
+
+  .nav-link {
+    @apply text-text hover:text-primary transition-colors duration-300;
+  }
+
+  .section-title {
+    @apply text-3xl font-bold text-text mb-6 relative;
+  }
+
+  .section-title::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-20 h-1 bg-primary rounded-full;
+  }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* 游戏卡片悬停效果 */
+.game-card {
+  @apply relative overflow-hidden;
+}
+
+.game-card::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300;
+}
+
+.game-card:hover::before {
+  @apply opacity-100;
+}
+
+.game-card-content {
+  @apply absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full transition-transform duration-300;
+}
+
+.game-card:hover .game-card-content {
+  @apply translate-y-0;
+}
+
+/* 导航栏样式 */
+.navbar {
+  @apply fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-md z-50;
+}
+
+.navbar-content {
+  @apply container mx-auto px-4 py-4 flex items-center justify-between;
+}
+
+/* 搜索框样式 */
+.search-input {
+  @apply w-full max-w-md px-4 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300;
+}
+
+/* 游戏详情页样式 */
+.game-detail {
+  @apply container mx-auto px-4 py-8;
+}
+
+.game-header {
+  @apply relative h-[500px] rounded-xl overflow-hidden mb-8;
+}
+
+.game-info {
+  @apply bg-white rounded-xl shadow-lg p-6 mb-8;
+}
+
+.game-screenshots {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4 mb-8;
+}
+
+.game-controls {
+  @apply bg-white rounded-xl shadow-lg p-6 mb-8;
+}
+
+/* 页脚样式 */
+.footer {
+  @apply bg-gray-900 text-white py-12 mt-12;
+}
+
+.footer-content {
+  @apply container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .game-header {
+    @apply h-[300px];
+  }
+  
+  .section-title {
+    @apply text-2xl;
+  }
+} 

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { PlayIcon, PauseIcon } from '@heroicons/react/24/outline';
 
 interface GameEmbedProps {
   gameUrl: string;
@@ -6,59 +7,81 @@ interface GameEmbedProps {
 }
 
 const GameEmbed: React.FC<GameEmbedProps> = ({ gameUrl, title }) => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const handleLoad = () => {
-    setIsLoading(false);
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  const handlePlayPause = () => {
+    setIsPlaying(!isPlaying);
   };
 
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
+  const handleFullscreen = () => {
+    const gameContainer = document.getElementById('game-container');
+    if (gameContainer) {
+      if (!document.fullscreenElement) {
+        gameContainer.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
     }
   };
 
   return (
-    <div className="relative w-full bg-black rounded-lg overflow-hidden">
-      {/* 加载进度条 */}
-      {isLoading && (
-        <div className="absolute top-0 left-0 w-full h-1 bg-gray-700">
-          <div className="h-full bg-primary animate-pulse" />
+    <div className="relative bg-black rounded-xl overflow-hidden">
+      {/* 游戏容器 */}
+      <div id="game-container" className="relative pt-[56.25%]">
+        <iframe
+          className="absolute top-0 left-0 w-full h-full"
+          src={gameUrl}
+          title={title}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+
+      {/* 控制栏 */}
+      <div className="absolute bottom-0 left-0 right-0 bg-black/80 backdrop-blur-sm p-4">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={handlePlayPause}
+            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+          >
+            {isPlaying ? (
+              <PauseIcon className="w-6 h-6 text-white" />
+            ) : (
+              <PlayIcon className="w-6 h-6 text-white" />
+            )}
+          </button>
+
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleFullscreen}
+              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-white text-sm"
+            >
+              {isFullscreen ? '退出全屏' : '全屏'}
+            </button>
+          </div>
         </div>
-      )}
+      </div>
 
-      {/* 游戏iframe */}
-      <iframe
-        src={gameUrl}
-        title={title}
-        className="w-full aspect-video"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        onLoad={handleLoad}
-      />
-
-      {/* 全屏按钮 */}
-      <button
-        onClick={toggleFullscreen}
-        className="absolute bottom-4 right-4 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-        aria-label={isFullscreen ? '退出全屏' : '全屏模式'}
-      >
-        {isFullscreen ? (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9h6v6M15 9l-6 6" />
-          </svg>
-        ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-          </svg>
-        )}
-      </button>
+      {/* 加载提示 */}
+      <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto mb-4" />
+          <p>游戏加载中...</p>
+        </div>
+      </div>
     </div>
   );
 };
