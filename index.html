@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joy Game Grid - Play Free Online Games | Joy Grid Gaming Platform</title>
+    <meta name="description" content="Play Joy Game Grid and other exciting online games for free. Experience the ultimate gaming platform with a collection of engaging games for all ages.">
+    <meta name="keywords" content="Joy Game Grid, online games, free games, browser games, casual games">
+    <link rel="canonical" href="https://joy-grid.com">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f7;
+        }
+        .game-container {
+            aspect-ratio: 16/9;
+            max-width: 100%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .feature-card {
+            transition: transform 0.2s ease-in-out;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/" class="text-2xl font-bold text-gray-900">Joy Grid</a>
+                <div class="space-x-4">
+                    <a href="#features" class="text-gray-600 hover:text-gray-900">Features</a>
+                    <a href="#how-to-play" class="text-gray-600 hover:text-gray-900">How to Play</a>
+                    <a href="#games" class="text-gray-600 hover:text-gray-900">More Games</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="container mx-auto px-4 py-16 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Joy Game Grid
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+            Experience the ultimate puzzle adventure in Joy Game Grid, where strategy meets entertainment in this engaging online game.
+        </p>
+    </section>
+
+    <!-- Game Section -->
+    <section class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="game-container mb-8">
+                <iframe 
+                    src="/games/game1/game.html" 
+                    class="w-full h-full"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Description Section -->
+    <section class="container mx-auto px-4 py-16 bg-white">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">About Joy Game Grid</h2>
+            <p class="text-gray-600 mb-6">
+                Joy Game Grid is an innovative puzzle game that challenges your strategic thinking and problem-solving skills. 
+                Navigate through increasingly complex levels, match colorful tiles, and unlock special power-ups as you progress.
+            </p>
+            <p class="text-gray-600">
+                With its intuitive controls and engaging gameplay, Joy Game Grid offers endless entertainment for players of all ages. 
+                Whether you're a casual gamer or a puzzle enthusiast, this game will keep you coming back for more.
+            </p>
+        </div>
+    </section>
+
+    <!-- How to Play Section -->
+    <section id="how-to-play" class="container mx-auto px-4 py-16">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">How to Play Joy Game Grid</h2>
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">1. Match the Tiles</h3>
+                    <p class="text-gray-600">Click or tap adjacent tiles to match three or more of the same color.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">2. Create Combos</h3>
+                    <p class="text-gray-600">Chain multiple matches to create powerful combos and earn bonus points.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">3. Use Power-ups</h3>
+                    <p class="text-gray-600">Collect and use special power-ups to clear difficult obstacles and reach higher scores.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="container mx-auto px-4 py-16 bg-white">
+        <h2 class="text-3xl font-bold text-gray-900 mb-12 text-center">Game Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="feature-card bg-gray-50 p-6 rounded-lg shadow-sm">
+                <h3 class="text-xl font-semibold text-gray-900 mb-3">Multiple Levels</h3>
+                <p class="text-gray-600">Progress through increasingly challenging levels with unique puzzles and obstacles.</p>
+            </div>
+            <div class="feature-card bg-gray-50 p-6 rounded-lg shadow-sm">
+                <h3 class="text-xl font-semibold text-gray-900 mb-3">Power-ups</h3>
+                <p class="text-gray-600">Unlock and use special power-ups to help you overcome difficult situations.</p>
+            </div>
+            <div class="feature-card bg-gray-50 p-6 rounded-lg shadow-sm">
+                <h3 class="text-xl font-semibold text-gray-900 mb-3">Global Leaderboard</h3>
+                <p class="text-gray-600">Compete with players worldwide and climb the global leaderboard.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- More Games Section -->
+    <section id="games" class="container mx-auto px-4 py-16">
+        <h2 class="text-3xl font-bold text-gray-900 mb-12 text-center">More Games</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <img src="/images/games/game2.jpg" alt="Racing Master Game" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Racing Master</h3>
+                    <p class="text-gray-600 mb-4">Experience the thrill of high-speed racing in this exciting game.</p>
+                    <a href="/games/2" class="text-blue-600 hover:text-blue-800">Play Now →</a>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <img src="/images/games/game3.jpg" alt="Puzzle Master Game" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Puzzle Master</h3>
+                    <p class="text-gray-600 mb-4">Challenge your mind with this engaging puzzle game.</p>
+                    <a href="/games/3" class="text-blue-600 hover:text-blue-800">Play Now →</a>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <img src="/images/games/game4.jpg" alt="Space Shooter Game" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Space Shooter</h3>
+                    <p class="text-gray-600 mb-4">Battle aliens in this exciting space shooting game.</p>
+                    <a href="/games/4" class="text-blue-600 hover:text-blue-800">Play Now →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center text-gray-600">
+                <p>&copy; 2024 Joy Grid. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 
