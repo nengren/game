@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Joy Game Grid - Free Online Puzzle Game | Joy Grid</title>
-    <meta name="description" content="Play Joy Game Grid, a free online puzzle game that challenges your strategic thinking. Match tiles, create combos, and unlock power-ups in this engaging game.">
-    <meta name="keywords" content="Joy Game Grid, puzzle game, online game, free game, browser game">
+    <title>Joy Game Grid - Classic Number Puzzle Game | Joy Grid</title>
+    <meta name="description" content="Play Joy Game Grid, a classic number puzzle game that challenges your strategic thinking. Arrange numbers in order by sliding tiles in this engaging puzzle game.">
+    <meta name="keywords" content="Joy Game Grid, number puzzle, sliding puzzle, 8-puzzle, brain game, online game">
     <link rel="canonical" href="https://joy-grid.com">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -42,14 +42,20 @@
             font-size: 24px;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         .game-tile:hover {
             transform: scale(1.05);
+            background: #f0f0f0;
         }
         .game-tile.empty {
             background: #f5f5f7;
+        }
+        .game-tile.moving {
+            transition: transform 0.2s ease;
         }
         .game-controls {
             padding: 16px;
@@ -70,10 +76,57 @@
             border-radius: 6px;
             border: none;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s ease;
+            font-weight: 500;
         }
         .game-button:hover {
             background: #0077ed;
+            transform: translateY(-1px);
+        }
+        .game-button:active {
+            transform: translateY(0);
+        }
+        .win-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -60%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        .win-message.show {
+            display: block;
+        }
+        .win-message h2 {
+            color: #1d1d1f;
+            margin-bottom: 16px;
+        }
+        .win-message p {
+            color: #666;
+            margin-bottom: 24px;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        .overlay.show {
+            display: block;
         }
     </style>
 </head>
@@ -95,7 +148,7 @@
                 Joy Game Grid
             </h1>
             <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                Experience the ultimate puzzle adventure where strategy meets entertainment in this engaging online game.
+                Challenge yourself with this classic number puzzle game. Arrange the numbers in order by sliding tiles into the empty space.
             </p>
         </section>
 
@@ -105,7 +158,7 @@
                 <div class="game-grid" id="gameGrid"></div>
                 <div class="game-controls">
                     <div class="game-status">Moves: <span id="moveCount">0</span></div>
-                    <button class="game-button" onclick="resetGame()">Reset Game</button>
+                    <button class="game-button" onclick="resetGame()">New Game</button>
                 </div>
             </div>
         </section>
@@ -115,16 +168,16 @@
             <h2 class="text-3xl font-bold text-gray-900 mb-6">How to Play</h2>
             <div class="space-y-4 mb-12">
                 <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">1. Move the Tiles</h3>
-                    <p class="text-gray-600">Click on any tile adjacent to the empty space to move it.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">1. Game Objective</h3>
+                    <p class="text-gray-600">Arrange the numbers 1-8 in ascending order, with the empty space at the bottom right.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">2. Arrange Numbers</h3>
-                    <p class="text-gray-600">Arrange the numbers in ascending order from left to right, top to bottom.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">2. Moving Tiles</h3>
+                    <p class="text-gray-600">Click or tap any number adjacent to the empty space to slide it into the empty position.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">3. Win the Game</h3>
-                    <p class="text-gray-600">Complete the puzzle with the fewest moves possible to achieve the highest score.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">3. Winning the Game</h3>
+                    <p class="text-gray-600">Complete the puzzle by arranging all numbers in order: 1-2-3 in the first row, 4-5-6 in the second row, and 7-8-empty in the last row.</p>
                 </div>
             </div>
 
@@ -132,15 +185,15 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                 <div class="bg-white p-6 rounded-lg shadow-sm">
                     <h3 class="text-xl font-semibold text-gray-900 mb-3">Simple Controls</h3>
-                    <p class="text-gray-600">Easy-to-use click interface that works on both desktop and mobile devices.</p>
+                    <p class="text-gray-600">Works perfectly on both desktop and mobile devices with touch support.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-sm">
                     <h3 class="text-xl font-semibold text-gray-900 mb-3">Move Counter</h3>
-                    <p class="text-gray-600">Track your progress with the move counter and try to beat your best score.</p>
+                    <p class="text-gray-600">Track your progress and try to solve the puzzle in fewer moves.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-sm">
                     <h3 class="text-xl font-semibold text-gray-900 mb-3">Instant Reset</h3>
-                    <p class="text-gray-600">Start a new game at any time with the reset button.</p>
+                    <p class="text-gray-600">Start a new game at any time with the "New Game" button.</p>
                 </div>
             </div>
         </section>
@@ -155,11 +208,20 @@
         </div>
     </footer>
 
+    <!-- Win Message -->
+    <div class="overlay" id="overlay"></div>
+    <div class="win-message" id="winMessage">
+        <h2>Congratulations!</h2>
+        <p>You solved the puzzle in <span id="winMoveCount">0</span> moves!</p>
+        <button class="game-button" onclick="startNewGame()">Play Again</button>
+    </div>
+
     <script>
         // Game state
         let tiles = [];
         let moveCount = 0;
         let emptyIndex = 8;
+        let isAnimating = false;
 
         // Initialize game
         function initGame() {
@@ -183,23 +245,31 @@
             });
         }
 
-        // Move tile
+        // Move tile with animation
         function moveTile(index) {
-            if (isAdjacent(index, emptyIndex)) {
-                // Swap tiles
-                [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
-                emptyIndex = index;
-                moveCount++;
-                updateMoveCount();
+            if (isAnimating || !isAdjacent(index, emptyIndex)) return;
+            
+            isAnimating = true;
+            const tile = document.querySelectorAll('.game-tile')[index];
+            tile.classList.add('moving');
+            
+            // Swap tiles
+            [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
+            emptyIndex = index;
+            moveCount++;
+            updateMoveCount();
+            
+            // Update display after animation
+            setTimeout(() => {
+                tile.classList.remove('moving');
                 renderGame();
+                isAnimating = false;
                 
                 // Check win condition
                 if (isWin()) {
-                    setTimeout(() => {
-                        alert(`Congratulations! You won in ${moveCount} moves!`);
-                    }, 100);
+                    showWinMessage();
                 }
-            }
+            }, 200);
         }
 
         // Check if tiles are adjacent
@@ -222,8 +292,26 @@
             document.getElementById('moveCount').textContent = moveCount;
         }
 
-        // Reset game
+        // Show win message
+        function showWinMessage() {
+            document.getElementById('winMoveCount').textContent = moveCount;
+            document.getElementById('winMessage').classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        // Start new game
+        function startNewGame() {
+            document.getElementById('winMessage').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+            resetGame();
+        }
+
+        // Reset game with shuffle
         function resetGame() {
+            // Initialize ordered array
+            tiles = [1, 2, 3, 4, 5, 6, 7, 8, null];
+            emptyIndex = 8;
+            
             // Shuffle tiles
             for (let i = 0; i < 1000; i++) {
                 const randomIndex = Math.floor(Math.random() * 8);
@@ -232,6 +320,7 @@
                     emptyIndex = randomIndex;
                 }
             }
+            
             moveCount = 0;
             updateMoveCount();
             renderGame();
