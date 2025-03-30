@@ -1,0 +1,9 @@
+{
+  "name": "joy-grid",
+  "version": "1.0.0",
+  "description": "Joy Game Grid website",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build step needed'"
+  }
+}
