@@ -26,13 +26,14 @@ export default function SlidingPuzzle({ difficulty = 'medium' }: SlidingPuzzlePr
   const [moves, setMoves] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState(difficulty);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const gridSize = {
     easy: 3,
     medium: 4,
     hard: 5,
-  }[difficulty];
+  }[selectedDifficulty];
 
   const initializePuzzle = () => {
     const totalTiles = gridSize * gridSize - 1;
@@ -68,12 +69,12 @@ export default function SlidingPuzzle({ difficulty = 'medium' }: SlidingPuzzlePr
 
   useEffect(() => {
     initializePuzzle();
-    gameStateManager.startGame(difficulty);
+    gameStateManager.startGame(selectedDifficulty);
     audioManager.loadSound('move', '/sounds/move.mp3');
     audioManager.loadSound('complete', '/sounds/complete.mp3');
     audioManager.loadMusic('/music/puzzle.mp3');
     audioManager.playMusic();
-  }, [difficulty]);
+  }, [selectedDifficulty]);
 
   useEffect(() => {
     if (startTime && !isSolved) {
@@ -99,7 +100,7 @@ export default function SlidingPuzzle({ difficulty = 'medium' }: SlidingPuzzlePr
         score: calculateScore(),
         time: elapsedTime,
         moves,
-        difficulty,
+        difficulty: selectedDifficulty,
         isVerified: false,
       });
     }
@@ -210,6 +211,11 @@ export default function SlidingPuzzle({ difficulty = 'medium' }: SlidingPuzzlePr
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [emptyTile, tiles, isSolved]);
 
+  const handleDifficultyChange = (newDifficulty: 'easy' | 'medium' | 'hard') => {
+    setSelectedDifficulty(newDifficulty);
+    initializePuzzle();
+  };
+
   return (
     <GameContainer
       title="Sliding Puzzle"
@@ -224,6 +230,44 @@ export default function SlidingPuzzle({ difficulty = 'medium' }: SlidingPuzzlePr
       isGameOver={isSolved}
       score={calculateScore()}
     >
+      <div className="mb-4 flex justify-center gap-4">
+        <button
+          onClick={() => handleDifficultyChange('easy')}
+          className={`px-4 py-2 rounded-lg font-medium ${
+            selectedDifficulty === 'easy'
+              ? 'bg-pink-500 text-white'
+              : 'bg-white text-gray-700 hover:bg-gray-50'
+          }`}
+        >
+          Easy (3x3)
+        </button>
+        <button
+          onClick={() => handleDifficultyChange('medium')}
+          className={`px-4 py-2 rounded-lg font-medium ${
+            selectedDifficulty === 'medium'
+              ? 'bg-pink-500 text-white'
+              : 'bg-white text-gray-700 hover:bg-gray-50'
+          }`}
+        >
+          Medium (4x4)
+        </button>
+        <button
+          onClick={() => handleDifficultyChange('hard')}
+          className={`px-4 py-2 rounded-lg font-medium ${
+            selectedDifficulty === 'hard'
+              ? 'bg-pink-500 text-white'
+              : 'bg-white text-gray-700 hover:bg-gray-50'
+          }`}
+        >
+          Hard (5x5)
+        </button>
+      </div>
+
+      <div className="mb-4 flex justify-center gap-4 text-gray-600">
+        <div>Time: {elapsedTime}s</div>
+        <div>Moves: {moves}</div>
+      </div>
+
       <div
         ref={containerRef}
         className="relative w-full h-full bg-white rounded-lg shadow-lg overflow-hidden"
@@ -258,6 +302,20 @@ export default function SlidingPuzzle({ difficulty = 'medium' }: SlidingPuzzlePr
           />
         )}
       </div>
+
+      {isSolved && (
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={() => {
+              setSelectedDifficulty(selectedDifficulty);
+              initializePuzzle();
+            }}
+            className="px-6 py-2 bg-gradient-to-r from-pink-500 to-blue-500 text-white font-medium rounded-lg hover:from-pink-600 hover:to-blue-600 transition-colors duration-200"
+          >
+            Play Again
+          </button>
+        </div>
+      )}
     </GameContainer>
   );
 } 
