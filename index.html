@@ -1015,6 +1015,21 @@
             return canvas.toDataURL('image/png');
         }
 
+        // Generate shareable URL
+        function generateShareableUrl() {
+            const gameState = {
+                size: gridSize,
+                score: {
+                    time: document.getElementById('timer').textContent,
+                    moves: moveCount
+                }
+            };
+            
+            // Create a unique game ID
+            const gameId = btoa(JSON.stringify(gameState)).replace(/[^a-zA-Z0-9]/g, '');
+            return `https://joy-grid.com/game/${gameId}?score=${encodeURIComponent(gameState.score.time)}&moves=${gameState.score.moves}`;
+        }
+
         // Share score with improved functionality
         async function shareScore() {
             const sharePreview = document.getElementById('sharePreview');
@@ -1024,9 +1039,12 @@
             // Generate and show preview
             await generateShareImage();
             
+            // Generate shareable URL
+            const gameUrl = generateShareableUrl();
+            
             // Update share text with proper English
             const timeText = document.getElementById('timer').textContent;
-            shareText.textContent = `🎮 I completed the Joy Game Grid ${gridSize}x${gridSize} puzzle in ${timeText} with ${moveCount} moves! Can you beat my score?`;
+            shareText.textContent = `🎮 I completed the Joy Game Grid ${gridSize}x${gridSize} puzzle in ${timeText} with ${moveCount} moves! Can you beat my score? ${gameUrl}`;
             
             // Try native share first
             if (navigator.share) {
@@ -1058,18 +1076,18 @@
         // Share with social media
         function shareWithSocial(platform) {
             const shareText = document.getElementById('shareText').textContent;
-            const url = 'https://joy-grid.com';
+            const gameUrl = generateShareableUrl();
             
             let shareUrl;
             switch (platform) {
                 case 'facebook':
-                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(shareText)}`;
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(gameUrl)}&quote=${encodeURIComponent(shareText)}`;
                     break;
                 case 'twitter':
-                    shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`;
+                    shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(gameUrl)}`;
                     break;
                 case 'whatsapp':
-                    shareUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + url)}`;
+                    shareUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + gameUrl)}`;
                     break;
             }
             
