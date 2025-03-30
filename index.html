@@ -17,12 +17,63 @@
             color: #1d1d1f;
         }
         .game-container {
-            aspect-ratio: 16/9;
-            max-width: 100%;
-            background: #000;
+            aspect-ratio: 1;
+            max-width: 500px;
+            margin: 0 auto;
+            background: #fff;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            padding: 16px;
+            background: #f5f5f7;
+        }
+        .game-tile {
+            aspect-ratio: 1;
+            background: #fff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .game-tile:hover {
+            transform: scale(1.05);
+        }
+        .game-tile.empty {
+            background: #f5f5f7;
+        }
+        .game-controls {
+            padding: 16px;
+            background: #fff;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .game-status {
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+        .game-button {
+            padding: 8px 16px;
+            background: #0071e3;
+            color: white;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .game-button:hover {
+            background: #0077ed;
         }
     </style>
 </head>
@@ -50,60 +101,46 @@
 
         <!-- Game Section -->
         <section class="mb-12">
-            <div class="max-w-4xl mx-auto">
-                <div class="game-container mb-8">
-                    <iframe 
-                        src="/games/game1/game.html" 
-                        class="w-full h-full"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                    </iframe>
+            <div class="game-container">
+                <div class="game-grid" id="gameGrid"></div>
+                <div class="game-controls">
+                    <div class="game-status">Moves: <span id="moveCount">0</span></div>
+                    <button class="game-button" onclick="resetGame()">Reset Game</button>
                 </div>
             </div>
         </section>
 
         <!-- Game Description -->
         <section class="max-w-3xl mx-auto">
-            <h2 class="text-3xl font-bold text-gray-900 mb-6">About Joy Game Grid</h2>
-            <p class="text-gray-600 mb-6">
-                Joy Game Grid is an innovative puzzle game that challenges your strategic thinking and problem-solving skills. 
-                Navigate through increasingly complex levels, match colorful tiles, and unlock special power-ups as you progress.
-            </p>
-            <p class="text-gray-600 mb-12">
-                With its intuitive controls and engaging gameplay, Joy Game Grid offers endless entertainment for players of all ages. 
-                Whether you're a casual gamer or a puzzle enthusiast, this game will keep you coming back for more.
-            </p>
-
             <h2 class="text-3xl font-bold text-gray-900 mb-6">How to Play</h2>
             <div class="space-y-4 mb-12">
                 <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">1. Match the Tiles</h3>
-                    <p class="text-gray-600">Click or tap adjacent tiles to match three or more of the same color.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">1. Move the Tiles</h3>
+                    <p class="text-gray-600">Click on any tile adjacent to the empty space to move it.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">2. Create Combos</h3>
-                    <p class="text-gray-600">Chain multiple matches to create powerful combos and earn bonus points.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">2. Arrange Numbers</h3>
+                    <p class="text-gray-600">Arrange the numbers in ascending order from left to right, top to bottom.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">3. Use Power-ups</h3>
-                    <p class="text-gray-600">Collect and use special power-ups to clear difficult obstacles and reach higher scores.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">3. Win the Game</h3>
+                    <p class="text-gray-600">Complete the puzzle with the fewest moves possible to achieve the highest score.</p>
                 </div>
             </div>
 
             <h2 class="text-3xl font-bold text-gray-900 mb-6">Game Features</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                 <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Multiple Levels</h3>
-                    <p class="text-gray-600">Progress through increasingly challenging levels with unique puzzles and obstacles.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Simple Controls</h3>
+                    <p class="text-gray-600">Easy-to-use click interface that works on both desktop and mobile devices.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Power-ups</h3>
-                    <p class="text-gray-600">Unlock and use special power-ups to help you overcome difficult situations.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Move Counter</h3>
+                    <p class="text-gray-600">Track your progress with the move counter and try to beat your best score.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Global Leaderboard</h3>
-                    <p class="text-gray-600">Compete with players worldwide and climb the global leaderboard.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Instant Reset</h3>
+                    <p class="text-gray-600">Start a new game at any time with the reset button.</p>
                 </div>
             </div>
         </section>
@@ -117,5 +154,91 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Game state
+        let tiles = [];
+        let moveCount = 0;
+        let emptyIndex = 8;
+
+        // Initialize game
+        function initGame() {
+            tiles = [1, 2, 3, 4, 5, 6, 7, 8, null];
+            moveCount = 0;
+            emptyIndex = 8;
+            updateMoveCount();
+            renderGame();
+        }
+
+        // Render game grid
+        function renderGame() {
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = '';
+            tiles.forEach((tile, index) => {
+                const div = document.createElement('div');
+                div.className = `game-tile ${!tile ? 'empty' : ''}`;
+                div.textContent = tile || '';
+                div.onclick = () => moveTile(index);
+                grid.appendChild(div);
+            });
+        }
+
+        // Move tile
+        function moveTile(index) {
+            if (isAdjacent(index, emptyIndex)) {
+                // Swap tiles
+                [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
+                emptyIndex = index;
+                moveCount++;
+                updateMoveCount();
+                renderGame();
+                
+                // Check win condition
+                if (isWin()) {
+                    setTimeout(() => {
+                        alert(`Congratulations! You won in ${moveCount} moves!`);
+                    }, 100);
+                }
+            }
+        }
+
+        // Check if tiles are adjacent
+        function isAdjacent(index1, index2) {
+            const row1 = Math.floor(index1 / 3);
+            const col1 = index1 % 3;
+            const row2 = Math.floor(index2 / 3);
+            const col2 = index2 % 3;
+            return (Math.abs(row1 - row2) === 1 && col1 === col2) ||
+                   (Math.abs(col1 - col2) === 1 && row1 === row2);
+        }
+
+        // Check win condition
+        function isWin() {
+            return tiles.slice(0, 8).every((tile, index) => tile === index + 1);
+        }
+
+        // Update move count display
+        function updateMoveCount() {
+            document.getElementById('moveCount').textContent = moveCount;
+        }
+
+        // Reset game
+        function resetGame() {
+            // Shuffle tiles
+            for (let i = 0; i < 1000; i++) {
+                const randomIndex = Math.floor(Math.random() * 8);
+                if (isAdjacent(randomIndex, emptyIndex)) {
+                    [tiles[randomIndex], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[randomIndex]];
+                    emptyIndex = randomIndex;
+                }
+            }
+            moveCount = 0;
+            updateMoveCount();
+            renderGame();
+        }
+
+        // Initialize game on load
+        initGame();
+    </script>
 </body>
 </html> 
