@@ -4,6 +4,6 @@
   "description": "Joy Game Grid website",
   "main": "index.html",
   "scripts": {
-    "build": "echo 'No build step needed'"
+    "build": "mkdir -p out && cp -r *.html *.css *.js favicon.ico images out/ 2>/dev/null || true"
   }
 }
