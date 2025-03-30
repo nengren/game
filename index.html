@@ -481,6 +481,12 @@
         let startTime = null;
         let timerInterval = null;
         let gridSize = 3;
+        let difficulty = 'medium'; // 'easy', 'medium', 'hard'
+        let minMoves = {
+            easy: 10,
+            medium: 20,
+            hard: 30
+        };
         let bestScores = {
             3: { moves: Infinity, time: Infinity },
             4: { moves: Infinity, time: Infinity },
@@ -488,6 +494,141 @@
         };
         let touchStartX = 0;
         let touchStartY = 0;
+
+        // Fisher-Yates shuffle algorithm
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Check if puzzle is solvable
+        function isSolvable(tiles) {
+            let inversions = 0;
+            const totalTiles = tiles.length;
+            
+            for (let i = 0; i < totalTiles - 1; i++) {
+                if (!tiles[i]) continue;
+                for (let j = i + 1; j < totalTiles; j++) {
+                    if (!tiles[j]) continue;
+                    if (tiles[i] > tiles[j]) inversions++;
+                }
+            }
+            
+            // For odd grid size, puzzle is solvable if inversions are even
+            // For even grid size, puzzle is solvable if inversions + empty tile row from bottom is odd
+            return gridSize % 2 === 1 ? inversions % 2 === 0 : inversions % 2 === 1;
+        }
+
+        // Generate random solvable puzzle
+        function generatePuzzle() {
+            const totalTiles = gridSize * gridSize;
+            let puzzle;
+            let attempts = 0;
+            const maxAttempts = 100;
+
+            do {
+                // Create ordered array
+                puzzle = Array.from({length: totalTiles - 1}, (_, i) => i + 1);
+                puzzle.push(null);
+                
+                // Shuffle puzzle
+                shuffle(puzzle);
+                
+                // Find empty tile position
+                const emptyPos = puzzle.indexOf(null);
+                const emptyRow = Math.floor(emptyPos / gridSize);
+                
+                // For even grid size, ensure empty tile is on even row from bottom
+                if (gridSize % 2 === 0) {
+                    const rowFromBottom = gridSize - emptyRow;
+                    if (rowFromBottom % 2 === 0) {
+                        // Swap with any adjacent tile to make it odd
+                        const swapIndex = emptyPos > 0 ? emptyPos - 1 : emptyPos + 1;
+                        [puzzle[emptyPos], puzzle[swapIndex]] = [puzzle[swapIndex], puzzle[emptyPos]];
+                    }
+                }
+                
+                attempts++;
+            } while (!isSolvable(puzzle) && attempts < maxAttempts);
+
+            return puzzle;
+        }
+
+        // Count minimum moves to solve
+        function countMinMoves(puzzle) {
+            let count = 0;
+            const totalTiles = gridSize * gridSize;
+            const target = Array.from({length: totalTiles - 1}, (_, i) => i + 1);
+            target.push(null);
+            
+            // Count moves needed to get each number to its position
+            for (let i = 0; i < totalTiles - 1; i++) {
+                const currentPos = puzzle.indexOf(i + 1);
+                const targetPos = target.indexOf(i + 1);
+                const currentRow = Math.floor(currentPos / gridSize);
+                const currentCol = currentPos % gridSize;
+                const targetRow = Math.floor(targetPos / gridSize);
+                const targetCol = targetPos % gridSize;
+                
+                count += Math.abs(currentRow - targetRow) + Math.abs(currentCol - targetCol);
+            }
+            
+            return count;
+        }
+
+        // Set game difficulty
+        function setDifficulty(size) {
+            gridSize = size;
+            document.querySelectorAll('.difficulty-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            resetGame();
+        }
+
+        // Initialize game
+        function initGame() {
+            const totalTiles = gridSize * gridSize;
+            let puzzle;
+            let minMoveCount;
+            
+            do {
+                puzzle = generatePuzzle();
+                minMoveCount = countMinMoves(puzzle);
+            } while (minMoveCount < minMoves[difficulty]);
+            
+            tiles = puzzle;
+            emptyIndex = tiles.indexOf(null);
+            moveCount = 0;
+            updateMoveCount();
+            renderGame();
+            startTimer();
+            updateBestScoreDisplay();
+            
+            // Show start message
+            showStartMessage();
+        }
+
+        // Show start message
+        function showStartMessage() {
+            const message = document.createElement('div');
+            message.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-xl px-4 py-2 rounded-lg shadow-lg text-gray-900 font-medium z-50';
+            message.textContent = 'Game Started!';
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.remove();
+            }, 2000);
+        }
+
+        // Reset game with shuffle
+        function resetGame() {
+            clearInterval(timerInterval);
+            initGame();
+        }
 
         // Load best scores from localStorage
         function loadBestScores() {
@@ -511,29 +652,6 @@
             } else {
                 document.getElementById('bestScore').textContent = `${best.moves} moves`;
             }
-        }
-
-        // Set game difficulty
-        function setDifficulty(size) {
-            gridSize = size;
-            document.querySelectorAll('.difficulty-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            resetGame();
-        }
-
-        // Initialize game
-        function initGame() {
-            const totalTiles = gridSize * gridSize;
-            tiles = Array.from({length: totalTiles - 1}, (_, i) => i + 1);
-            tiles.push(null);
-            moveCount = 0;
-            emptyIndex = totalTiles - 1;
-            updateMoveCount();
-            renderGame();
-            startTimer();
-            updateBestScoreDisplay();
         }
 
         // Start timer
@@ -761,28 +879,6 @@
             document.getElementById('winMessage').classList.remove('show');
             document.getElementById('overlay').classList.remove('show');
             resetGame();
-        }
-
-        // Reset game with shuffle
-        function resetGame() {
-            const totalTiles = gridSize * gridSize;
-            tiles = Array.from({length: totalTiles - 1}, (_, i) => i + 1);
-            tiles.push(null);
-            emptyIndex = totalTiles - 1;
-            
-            // Shuffle tiles
-            for (let i = 0; i < 1000; i++) {
-                const randomIndex = Math.floor(Math.random() * (totalTiles - 1));
-                if (isAdjacent(randomIndex, emptyIndex)) {
-                    [tiles[randomIndex], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[randomIndex]];
-                    emptyIndex = randomIndex;
-                }
-            }
-            
-            moveCount = 0;
-            updateMoveCount();
-            renderGame();
-            startTimer();
         }
 
         // Touch event handlers
