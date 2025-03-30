@@ -928,46 +928,6 @@
             }
         }, TOUCH_DEBOUNCE);
 
-        // Share score
-        async function shareScore() {
-            const sharePreview = document.getElementById('sharePreview');
-            const overlay = document.getElementById('overlay');
-            const shareText = document.getElementById('shareText');
-            
-            // Generate and show preview
-            await generateShareImage();
-            
-            // Update share text with proper English
-            const timeText = document.getElementById('timer').textContent;
-            shareText.textContent = `🎮 I completed the Joy Game Grid ${gridSize}x${gridSize} puzzle in ${timeText} with ${moveCount} moves! Can you beat my score?`;
-            
-            // Try native share first
-            if (navigator.share) {
-                try {
-                    const canvas = document.getElementById('shareCanvas');
-                    const blob = await (await fetch(canvas.toDataURL('image/png'))).blob();
-                    const file = new File([blob], `joy-grid-score-${gridSize}x${gridSize}.png`, { type: 'image/png' });
-                    
-                    await navigator.share({
-                        title: 'Joy Game Grid Score',
-                        text: shareText.textContent,
-                        files: [file]
-                    });
-                    
-                    // Close preview if share successful
-                    sharePreview.classList.remove('show');
-                    overlay.classList.remove('show');
-                    return;
-                } catch (error) {
-                    console.log('Native share failed, showing preview');
-                }
-            }
-            
-            // Show preview if native share not available
-            sharePreview.classList.add('show');
-            overlay.classList.add('show');
-        }
-
         // Generate share image with improved quality
         async function generateShareImage() {
             const canvas = document.getElementById('shareCanvas');
@@ -1053,6 +1013,46 @@
             ctx.fill();
             
             return canvas.toDataURL('image/png');
+        }
+
+        // Share score with improved functionality
+        async function shareScore() {
+            const sharePreview = document.getElementById('sharePreview');
+            const overlay = document.getElementById('overlay');
+            const shareText = document.getElementById('shareText');
+            
+            // Generate and show preview
+            await generateShareImage();
+            
+            // Update share text with proper English
+            const timeText = document.getElementById('timer').textContent;
+            shareText.textContent = `🎮 I completed the Joy Game Grid ${gridSize}x${gridSize} puzzle in ${timeText} with ${moveCount} moves! Can you beat my score?`;
+            
+            // Try native share first
+            if (navigator.share) {
+                try {
+                    const canvas = document.getElementById('shareCanvas');
+                    const blob = await (await fetch(canvas.toDataURL('image/png'))).blob();
+                    const file = new File([blob], `joy-grid-score-${gridSize}x${gridSize}.png`, { type: 'image/png' });
+                    
+                    await navigator.share({
+                        title: 'Joy Game Grid Score',
+                        text: shareText.textContent,
+                        files: [file]
+                    });
+                    
+                    // Close preview if share successful
+                    sharePreview.classList.remove('show');
+                    overlay.classList.remove('show');
+                    return;
+                } catch (error) {
+                    console.log('Native share failed, showing preview');
+                }
+            }
+            
+            // Show preview if native share not available
+            sharePreview.classList.add('show');
+            overlay.classList.add('show');
         }
 
         // Share with social media
