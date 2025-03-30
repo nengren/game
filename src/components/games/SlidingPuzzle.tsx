@@ -36,28 +36,33 @@ export default function SlidingPuzzle({ difficulty = 'medium' }: SlidingPuzzlePr
   }[selectedDifficulty];
 
   const initializePuzzle = () => {
-    const totalTiles = gridSize * gridSize - 1;
-    const newTiles: Tile[] = Array.from({ length: totalTiles }, (_, index) => ({
-      id: index,
-      value: index + 1,
-      x: index % gridSize,
-      y: Math.floor(index / gridSize),
-    }));
+    const totalTiles = gridSize * gridSize;
+    const numbers = Array.from({ length: totalTiles - 1 }, (_, i) => i + 1);
+    
+    // 随机打乱数字
+    for (let i = numbers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+    }
 
-    // Add empty tile
+    // 创建拼图方块
+    const newTiles: Tile[] = [];
+    for (let i = 0; i < totalTiles - 1; i++) {
+      newTiles.push({
+        id: i,
+        value: numbers[i],
+        x: i % gridSize,
+        y: Math.floor(i / gridSize),
+      });
+    }
+
+    // 添加空白方块
     const empty: Tile = {
-      id: totalTiles,
+      id: totalTiles - 1,
       value: 0,
       x: gridSize - 1,
       y: gridSize - 1,
     };
-
-    // Shuffle tiles
-    for (let i = newTiles.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newTiles[i].x, newTiles[j].x] = [newTiles[j].x, newTiles[i].x];
-      [newTiles[i].y, newTiles[j].y] = [newTiles[j].y, newTiles[i].y];
-    }
 
     setTiles(newTiles);
     setEmptyTile(empty);
@@ -230,59 +235,75 @@ export default function SlidingPuzzle({ difficulty = 'medium' }: SlidingPuzzlePr
       isGameOver={isSolved}
       score={calculateScore()}
     >
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-white mb-2">Joy Game Grid</h1>
+        <p className="text-white/90">Challenge yourself with this fun number puzzle game. Arrange the numbers in order by sliding tiles into the empty space.</p>
+      </div>
+
       <div className="mb-4 flex justify-center gap-4">
         <button
           onClick={() => handleDifficultyChange('easy')}
           className={`px-4 py-2 rounded-lg font-medium ${
             selectedDifficulty === 'easy'
-              ? 'bg-pink-500 text-white'
+              ? 'bg-teal-500 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-50'
           }`}
         >
-          Easy (3x3)
+          3x3
         </button>
         <button
           onClick={() => handleDifficultyChange('medium')}
           className={`px-4 py-2 rounded-lg font-medium ${
             selectedDifficulty === 'medium'
-              ? 'bg-pink-500 text-white'
+              ? 'bg-teal-500 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-50'
           }`}
         >
-          Medium (4x4)
+          4x4
         </button>
         <button
           onClick={() => handleDifficultyChange('hard')}
           className={`px-4 py-2 rounded-lg font-medium ${
             selectedDifficulty === 'hard'
-              ? 'bg-pink-500 text-white'
+              ? 'bg-teal-500 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-50'
           }`}
         >
-          Hard (5x5)
+          5x5
         </button>
       </div>
 
-      <div className="mb-4 flex justify-center gap-4 text-gray-600">
-        <div>Time: {elapsedTime}s</div>
-        <div>Moves: {moves}</div>
+      <div className="mb-4 flex justify-center gap-8">
+        <div className="bg-white rounded-lg px-4 py-2 text-center">
+          <div className="text-2xl font-bold text-gray-900">{moves}</div>
+          <div className="text-sm text-gray-600">Moves</div>
+        </div>
+        <div className="bg-white rounded-lg px-4 py-2 text-center">
+          <div className="text-2xl font-bold text-gray-900">{elapsedTime}s</div>
+          <div className="text-sm text-gray-600">Time</div>
+        </div>
+        <div className="bg-white rounded-lg px-4 py-2 text-center">
+          <div className="text-2xl font-bold text-gray-900">-</div>
+          <div className="text-sm text-gray-600">Best Score</div>
+        </div>
       </div>
 
       <div
         ref={containerRef}
-        className="relative w-full h-full bg-white rounded-lg shadow-lg overflow-hidden"
+        className="relative aspect-square w-full bg-white rounded-xl shadow-lg overflow-hidden"
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
         {tiles.map((tile) => (
           <div
             key={tile.id}
-            className="absolute bg-gradient-to-br from-pink-400 to-blue-400 text-white font-bold flex items-center justify-center rounded-lg shadow-md transition-transform duration-200 hover:scale-105"
+            className="absolute bg-gradient-to-br from-teal-400 to-blue-500 text-white text-2xl font-bold flex items-center justify-center rounded-lg shadow-md cursor-pointer transition-transform duration-200 hover:scale-105"
             style={{
               width: `${100 / gridSize}%`,
               height: `${100 / gridSize}%`,
               left: `${(tile.x * 100) / gridSize}%`,
               top: `${(tile.y * 100) / gridSize}%`,
+              transform: isDragging ? 'scale(1.1)' : 'scale(1)',
             }}
             onClick={() => moveTile(tile)}
             onTouchStart={(e) => handleTouchStart(e, tile)}
@@ -303,19 +324,14 @@ export default function SlidingPuzzle({ difficulty = 'medium' }: SlidingPuzzlePr
         )}
       </div>
 
-      {isSolved && (
-        <div className="mt-4 flex justify-center">
-          <button
-            onClick={() => {
-              setSelectedDifficulty(selectedDifficulty);
-              initializePuzzle();
-            }}
-            className="px-6 py-2 bg-gradient-to-r from-pink-500 to-blue-500 text-white font-medium rounded-lg hover:from-pink-600 hover:to-blue-600 transition-colors duration-200"
-          >
-            Play Again
-          </button>
-        </div>
-      )}
+      <div className="mt-4 flex justify-center">
+        <button
+          onClick={initializePuzzle}
+          className="px-6 py-2 bg-teal-500 text-white font-medium rounded-lg hover:bg-teal-600 transition-colors duration-200"
+        >
+          New Game
+        </button>
+      </div>
     </GameContainer>
   );
 } 

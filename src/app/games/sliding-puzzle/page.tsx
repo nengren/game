@@ -5,7 +5,7 @@ import GameLayout from '@/components/layouts/GameLayout';
 export default function SlidingPuzzlePage() {
   return (
     <GameLayout>
-      <div className="py-8">
+      <div className="container mx-auto min-h-screen py-8">
         <SlidingPuzzle difficulty="medium" />
       </div>
     </GameLayout>
