@@ -677,7 +677,7 @@
             resetGame();
         }
 
-        // Initialize game
+        // Initialize game with proper rendering
         function initGame() {
             const totalTiles = gridSize * gridSize;
             let puzzle;
@@ -692,7 +692,16 @@
             emptyIndex = tiles.indexOf(null);
             moveCount = 0;
             updateMoveCount();
+            
+            // Update grid layout
+            const grid = document.getElementById('gameGrid');
+            grid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            grid.style.gap = `${8 / gridSize}px`;
+            
+            // Render game with proper styling
             renderGame();
+            
+            // Start timer and update best score
             startTimer();
             updateBestScoreDisplay();
             
@@ -758,16 +767,38 @@
             document.getElementById('timer').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        // Render game grid
+        // Render game with improved styling
         function renderGame() {
             const grid = document.getElementById('gameGrid');
-            grid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
             grid.innerHTML = '';
+            
             tiles.forEach((tile, index) => {
                 const div = document.createElement('div');
                 div.className = `game-tile ${!tile ? 'empty' : ''}`;
+                
+                // Calculate tile size based on grid size
+                const tileSize = Math.min(100, 90 / gridSize);
+                div.style.fontSize = `${tileSize * 0.4}px`;
+                
+                // Add number or empty space
                 div.textContent = tile || '';
+                
+                // Add click handler
                 div.onclick = () => moveTile(index);
+                
+                // Add hover effect
+                div.onmouseenter = () => {
+                    if (!isAnimating && isAdjacent(index, emptyIndex)) {
+                        div.style.transform = 'scale(1.05) translateY(-2px)';
+                        div.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.2)';
+                    }
+                };
+                
+                div.onmouseleave = () => {
+                    div.style.transform = '';
+                    div.style.boxShadow = '';
+                };
+                
                 grid.appendChild(div);
             });
         }
