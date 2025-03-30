@@ -62,25 +62,21 @@ export interface Game {
   };
 }
 
+export interface Position {
+  row: number;
+  col: number;
+}
+
 export interface Tile {
   id: number;
   value: number;
-  currentPosition: {
-    row: number;
-    col: number;
-  };
-  correctPosition: {
-    row: number;
-    col: number;
-  };
+  currentPosition: Position;
+  targetPosition: Position;
 }
 
 export interface GameState {
   tiles: Tile[];
-  emptyTilePosition: {
-    row: number;
-    col: number;
-  };
+  emptyTilePosition: Position;
   moves: number;
   timeElapsed: number;
   isComplete: boolean;
@@ -118,6 +114,8 @@ export interface GameSettings {
   isSoundEnabled: boolean;
   isTimerEnabled: boolean;
 }
+
+export type Difficulty = 'easy' | 'medium' | 'hard';
 
 export interface GameStats {
   bestScore: number;
