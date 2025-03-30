@@ -1,0 +1,23 @@
+{
+  "games": [
+    {
+      "id": "sliding-puzzle",
+      "title": "Sliding Puzzle",
+      "slug": "sliding-puzzle",
+      "description": "A classic sliding puzzle game where you need to arrange numbered tiles in order.",
+      "instructions": "Use arrow keys or swipe to move tiles. Try to arrange them in ascending order with the empty space at the end.",
+      "playUrl": "/games/sliding-puzzle",
+      "imageUrl": "/images/sliding-puzzle.jpg",
+      "thumbnailUrl": "/images/sliding-puzzle-thumb.jpg",
+      "controls": {
+        "desktop": "Use arrow keys to move tiles",
+        "mobile": "Swipe to move tiles"
+      },
+      "features": ["Responsive Design", "Touch Controls", "Score Tracking"],
+      "category": "puzzle",
+      "tags": ["puzzle", "sliding", "numbers"],
+      "featured": true,
+      "shareImage": "/images/sliding-puzzle-share.jpg"
+    }
+  ]
+} 

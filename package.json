@@ -5,5 +5,17 @@
   "main": "index.html",
   "scripts": {
     "build": "mkdir -p out && cp -r *.html *.css *.js favicon.ico images out/ 2>/dev/null || true"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@types/next": "^8.0.7",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "next": "^15.2.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   }
 }
