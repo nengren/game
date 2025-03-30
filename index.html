@@ -4,12 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Joy Game Grid - Fun Number Puzzle Game | Joy Grid</title>
+    
+    <!-- SEO Meta Tags -->
     <meta name="description" content="Play Joy Game Grid, a fun and engaging number puzzle game. Challenge yourself to arrange numbers in order with colorful tiles and exciting animations.">
     <meta name="keywords" content="Joy Game Grid, number puzzle, sliding puzzle, 8-puzzle, brain game, online game">
     <link rel="canonical" href="https://joy-grid.com">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Joy Game Grid - Fun Number Puzzle Game">
+    <meta property="og:description" content="Challenge yourself with this fun number puzzle game. Arrange the numbers in order by sliding tiles into the empty space.">
+    <meta property="og:image" content="https://joy-grid.com/images/og-image.jpg">
+    <meta property="og:url" content="https://joy-grid.com">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Joy Game Grid">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Joy Game Grid - Fun Number Puzzle Game">
+    <meta name="twitter:description" content="Challenge yourself with this fun number puzzle game. Arrange the numbers in order by sliding tiles into the empty space.">
+    <meta name="twitter:image" content="https://joy-grid.com/images/og-image.jpg">
+    
+    <!-- Facebook App ID -->
+    <meta property="fb:app_id" content="YOUR_FACEBOOK_APP_ID">
+    
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <!-- Facebook SDK -->
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
         * {
@@ -468,7 +492,7 @@
         <canvas id="shareCanvas"></canvas>
         <div class="share-actions">
             <button class="game-button" onclick="downloadShareImage()">Download</button>
-            <button class="game-button share" onclick="shareWithWebAPI()">Share</button>
+            <button class="game-button share" onclick="shareWithFacebook()">Share</button>
         </div>
     </div>
 
@@ -851,8 +875,8 @@
             const ctx = canvas.getContext('2d');
             
             // 设置画布大小
-            canvas.width = 800;
-            canvas.height = 1000;
+            canvas.width = 1200; // 增加分辨率
+            canvas.height = 630; // 优化为社交媒体推荐尺寸
             
             // 绘制背景
             ctx.fillStyle = '#ffffff';
@@ -863,11 +887,13 @@
             const gameImage = await html2canvas(gameContainer, {
                 scale: 2,
                 backgroundColor: null,
-                logging: false
+                logging: false,
+                useCORS: true,
+                allowTaint: true
             });
             
             // 计算游戏网格位置
-            const gameWidth = canvas.width * 0.8;
+            const gameWidth = canvas.width * 0.6;
             const gameHeight = gameWidth;
             const gameX = (canvas.width - gameWidth) / 2;
             const gameY = 100;
@@ -877,24 +903,24 @@
             
             // 绘制标题
             ctx.fillStyle = '#2D3436';
-            ctx.font = 'bold 36px Quicksand';
+            ctx.font = 'bold 48px Quicksand';
             ctx.textAlign = 'center';
             ctx.fillText('Joy Game Grid', canvas.width / 2, 60);
             
             // 绘制成绩
-            ctx.font = 'bold 28px Quicksand';
+            ctx.font = 'bold 36px Quicksand';
             const statsY = gameY + gameHeight + 50;
             ctx.fillText(`Moves: ${moveCount}`, canvas.width / 2, statsY);
-            ctx.fillText(`Time: ${document.getElementById('timer').textContent}`, canvas.width / 2, statsY + 40);
+            ctx.fillText(`Time: ${document.getElementById('timer').textContent}`, canvas.width / 2, statsY + 50);
             
             // 绘制网站URL
-            ctx.font = '20px Quicksand';
+            ctx.font = '24px Quicksand';
             ctx.fillText('joy-grid.com', canvas.width / 2, statsY + 100);
             
             // 绘制装饰元素
             ctx.fillStyle = '#FF6B6B';
             ctx.beginPath();
-            ctx.arc(canvas.width / 2, statsY + 160, 30, 0, Math.PI * 2);
+            ctx.arc(canvas.width / 2, statsY + 160, 40, 0, Math.PI * 2);
             ctx.fill();
             
             return canvas.toDataURL('image/png');
@@ -909,6 +935,27 @@
             await generateShareImage();
             sharePreview.classList.add('show');
             overlay.classList.add('show');
+        }
+
+        // Share with Facebook
+        async function shareWithFacebook() {
+            const shareText = `🎮 我在Joy Game Grid完成了${gridSize}x${gridSize}的挑战，用了${moveCount}步和${document.getElementById('timer').textContent}！来挑战我吧！`;
+            
+            if (typeof FB !== 'undefined') {
+                FB.ui({
+                    method: 'share',
+                    href: 'https://joy-grid.com',
+                    quote: shareText,
+                    hashtag: '#JoyGameGrid'
+                }, function(response) {
+                    if (response && !response.error_message) {
+                        showToast('分享成功！');
+                    }
+                });
+            } else {
+                // Fallback to Web Share API
+                await shareWithWebAPI();
+            }
         }
 
         // Share with Web Share API
@@ -931,12 +978,13 @@
                     });
                 } catch (error) {
                     console.error('分享失败:', error);
+                    // Fallback to download
+                    downloadShareImage();
                 }
+            } else {
+                // Fallback to download
+                downloadShareImage();
             }
-            
-            // 关闭预览
-            document.getElementById('sharePreview').classList.remove('show');
-            document.getElementById('overlay').classList.remove('show');
         }
 
         // Download share image
@@ -987,6 +1035,16 @@
         loadBestScores();
         initGame();
         initTouchEvents();
+
+        // Facebook SDK initialization
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId: 'YOUR_FACEBOOK_APP_ID',
+                cookie: true,
+                xfbml: true,
+                version: 'v18.0'
+            });
+        };
     </script>
 </body>
 </html> 
