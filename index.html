@@ -494,6 +494,11 @@
         };
         let touchStartX = 0;
         let touchStartY = 0;
+        let touchStartTime = 0;
+        let lastTouchTime = 0;
+        const TOUCH_DEBOUNCE = 300; // 防抖时间（毫秒）
+        const MIN_SWIPE_DISTANCE = 20; // 最小滑动距离
+        const VIBRATION_DURATION = 50; // 振动持续时间
 
         // Fisher-Yates shuffle algorithm
         function shuffle(array) {
@@ -760,52 +765,133 @@
             playSound('win');
         }
 
+        // Touch event handlers
+        function provideTouchFeedback() {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(VIBRATION_DURATION);
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function handleTouchStart(e) {
+            if (isAnimating) return;
+            
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            touchStartTime = Date.now();
+            
+            // 添加触摸反馈
+            provideTouchFeedback();
+        }
+
+        function handleTouchMove(e) {
+            if (isAnimating) return;
+            
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - touchStartX;
+            const deltaY = touch.clientY - touchStartY;
+            
+            // 如果移动距离超过阈值，阻止默认滚动
+            if (Math.abs(deltaX) > MIN_SWIPE_DISTANCE || Math.abs(deltaY) > MIN_SWIPE_DISTANCE) {
+                e.preventDefault();
+            }
+        }
+
+        const handleTouchEnd = debounce((e) => {
+            if (isAnimating) return;
+            
+            const touch = e.changedTouches[0];
+            const deltaX = touch.clientX - touchStartX;
+            const deltaY = touch.clientY - touchStartY;
+            const touchDuration = Date.now() - touchStartTime;
+            
+            // 检查是否是有效的滑动
+            if (Math.abs(deltaX) > MIN_SWIPE_DISTANCE || Math.abs(deltaY) > MIN_SWIPE_DISTANCE) {
+                // 确定滑动方向
+                let targetIndex = -1;
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    // 水平滑动
+                    targetIndex = deltaX > 0 ? emptyIndex - 1 : emptyIndex + 1;
+                } else {
+                    // 垂直滑动
+                    targetIndex = deltaY > 0 ? emptyIndex - gridSize : emptyIndex + gridSize;
+                }
+                
+                // 检查目标位置是否有效
+                if (targetIndex >= 0 && targetIndex < tiles.length && isAdjacent(targetIndex, emptyIndex)) {
+                    moveTile(targetIndex);
+                }
+            } else if (touchDuration < 200) {
+                // 处理点击事件
+                const target = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (target && target.classList.contains('game-tile')) {
+                    const index = Array.from(target.parentNode.children).indexOf(target);
+                    if (isAdjacent(index, emptyIndex)) {
+                        moveTile(index);
+                    }
+                }
+            }
+        }, TOUCH_DEBOUNCE);
+
         // Generate share image
         async function generateShareImage() {
             const canvas = document.getElementById('shareCanvas');
             const ctx = canvas.getContext('2d');
-            const gameContainer = document.querySelector('.game-container');
             
-            // Set canvas size
+            // 设置画布大小
             canvas.width = 800;
             canvas.height = 1000;
             
-            // Draw background
+            // 绘制背景
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Draw game grid
+            // 绘制游戏网格
+            const gameContainer = document.querySelector('.game-container');
             const gameImage = await html2canvas(gameContainer, {
                 scale: 2,
                 backgroundColor: null,
                 logging: false
             });
             
-            // Calculate game grid position
+            // 计算游戏网格位置
             const gameWidth = canvas.width * 0.8;
             const gameHeight = gameWidth;
             const gameX = (canvas.width - gameWidth) / 2;
             const gameY = 100;
             
-            // Draw game grid
+            // 绘制游戏网格
             ctx.drawImage(gameImage, gameX, gameY, gameWidth, gameHeight);
             
-            // Draw stats
+            // 绘制标题
             ctx.fillStyle = '#2D3436';
-            ctx.font = 'bold 32px Quicksand';
+            ctx.font = 'bold 36px Quicksand';
             ctx.textAlign = 'center';
+            ctx.fillText('Joy Game Grid', canvas.width / 2, 60);
             
+            // 绘制成绩
+            ctx.font = 'bold 28px Quicksand';
             const statsY = gameY + gameHeight + 50;
             ctx.fillText(`Moves: ${moveCount}`, canvas.width / 2, statsY);
             ctx.fillText(`Time: ${document.getElementById('timer').textContent}`, canvas.width / 2, statsY + 40);
             
-            // Draw logo and URL
-            ctx.font = 'bold 24px Quicksand';
-            ctx.fillText('Joy Game Grid', canvas.width / 2, statsY + 100);
+            // 绘制网站URL
             ctx.font = '20px Quicksand';
-            ctx.fillText('joy-grid.com', canvas.width / 2, statsY + 130);
+            ctx.fillText('joy-grid.com', canvas.width / 2, statsY + 100);
             
-            // Draw decorative elements
+            // 绘制装饰元素
             ctx.fillStyle = '#FF6B6B';
             ctx.beginPath();
             ctx.arc(canvas.width / 2, statsY + 160, 30, 0, Math.PI * 2);
@@ -819,7 +905,7 @@
             const sharePreview = document.getElementById('sharePreview');
             const overlay = document.getElementById('overlay');
             
-            // Generate and show preview
+            // 生成并显示预览
             await generateShareImage();
             sharePreview.classList.add('show');
             overlay.classList.add('show');
@@ -830,7 +916,7 @@
             const canvas = document.getElementById('shareCanvas');
             const imageData = canvas.toDataURL('image/png');
             
-            // Convert base64 to blob
+            // 转换为Blob
             const response = await fetch(imageData);
             const blob = await response.blob();
             
@@ -840,15 +926,15 @@
                 try {
                     await navigator.share({
                         title: 'Joy Game Grid Score',
-                        text: `🎮 I solved the ${gridSize}x${gridSize} puzzle in ${moveCount} moves and ${document.getElementById('timer').textContent}! Can you beat my score?`,
+                        text: `🎮 我在Joy Game Grid完成了${gridSize}x${gridSize}的挑战，用了${moveCount}步和${document.getElementById('timer').textContent}！来挑战我吧：joy-grid.com`,
                         files: [file]
                     });
                 } catch (error) {
-                    console.error('Error sharing:', error);
+                    console.error('分享失败:', error);
                 }
             }
             
-            // Close preview
+            // 关闭预览
             document.getElementById('sharePreview').classList.remove('show');
             document.getElementById('overlay').classList.remove('show');
         }
@@ -861,7 +947,7 @@
             link.href = canvas.toDataURL('image/png');
             link.click();
             
-            // Close preview
+            // 关闭预览
             document.getElementById('sharePreview').classList.remove('show');
             document.getElementById('overlay').classList.remove('show');
         }
@@ -881,40 +967,26 @@
             resetGame();
         }
 
-        // Touch event handlers
-        function handleTouchStart(e) {
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-        }
-
-        function handleTouchEnd(e) {
-            const touchEndX = e.changedTouches[0].clientX;
-            const touchEndY = e.changedTouches[0].clientY;
+        // Initialize touch events
+        function initTouchEvents() {
+            const gameGrid = document.getElementById('gameGrid');
             
-            const deltaX = touchEndX - touchStartX;
-            const deltaY = touchEndY - touchStartY;
+            gameGrid.addEventListener('touchstart', handleTouchStart, { passive: false });
+            gameGrid.addEventListener('touchmove', handleTouchMove, { passive: false });
+            gameGrid.addEventListener('touchend', handleTouchEnd, { passive: true });
             
-            // Determine swipe direction
-            if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                const targetIndex = deltaX > 0 ? emptyIndex - 1 : emptyIndex + 1;
-                if (targetIndex >= 0 && targetIndex < tiles.length && isAdjacent(targetIndex, emptyIndex)) {
-                    moveTile(targetIndex);
+            // 防止iOS设备上的橡皮筋效果
+            document.body.addEventListener('touchmove', (e) => {
+                if (e.target.closest('.game-container')) {
+                    e.preventDefault();
                 }
-            } else {
-                const targetIndex = deltaY > 0 ? emptyIndex - gridSize : emptyIndex + gridSize;
-                if (targetIndex >= 0 && targetIndex < tiles.length && isAdjacent(targetIndex, emptyIndex)) {
-                    moveTile(targetIndex);
-                }
-            }
+            }, { passive: false });
         }
 
         // Initialize game on load
         loadBestScores();
         initGame();
-
-        // Add touch event listeners
-        document.getElementById('gameGrid').addEventListener('touchstart', handleTouchStart, { passive: true });
-        document.getElementById('gameGrid').addEventListener('touchend', handleTouchEnd, { passive: true });
+        initTouchEvents();
     </script>
 </body>
 </html> 
