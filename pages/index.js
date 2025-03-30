@@ -1,63 +1,60 @@
-import Layout from '@/components/layout';
-import GameCard from '@/components/gameCard';
-import Link from 'next/link';
+import Head from 'next/head'
+import Link from 'next/link'
 
-export default function Home({ games, categories }) {
+export default function Home() {
   return (
-    <Layout>
-      {/* 英雄区域 */}
-      <section className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          欢迎来到 Joy Grid
-        </h1>
-        <p className="text-xl text-gray-600">
-          你的游戏天堂，随时随地享受精彩游戏体验
-        </p>
-      </section>
+    <div className="min-h-screen bg-gray-100">
+      <Head>
+        <title>Joy Grid - 游戏集合</title>
+        <meta name="description" content="发现精彩游戏，开启欢乐时光" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
-      {/* 游戏分类 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">游戏分类</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {categories.map((category) => (
-            <Link
-              key={category}
-              href={`/category/${category}`}
-              className="p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow text-center"
-            >
-              {category}
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* 热门游戏 */}
-      <section>
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">热门游戏</h2>
+      <main className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold text-center mb-8">欢迎来到 Joy Grid</h1>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {games.map((game) => (
-            <GameCard
-              key={game.id}
-              id={game.id}
-              title={game.title}
-              description={game.description}
-              imageUrl={game.imageUrl}
-              category={game.category}
-            />
-          ))}
-        </div>
-      </section>
-    </Layout>
-  );
-}
+          {/* 游戏卡片 */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <img src="/images/games/game1.jpg" alt="超级冒险" className="w-full h-48 object-cover" />
+            <div className="p-4">
+              <h2 className="text-xl font-semibold mb-2">超级冒险</h2>
+              <p className="text-gray-600 mb-4">一个激动人心的冒险游戏，玩家需要在充满挑战的世界中探索、战斗和收集宝藏。</p>
+              <Link href="/games/1" className="block w-full text-center bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+                开始游戏
+              </Link>
+            </div>
+          </div>
 
-export async function getStaticProps() {
-  const data = await import('@/public/data/games.json');
-  
-  return {
-    props: {
-      games: data.games,
-      categories: data.categories,
-    },
-  };
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <img src="/images/games/game2.jpg" alt="赛车大师" className="w-full h-48 object-cover" />
+            <div className="p-4">
+              <h2 className="text-xl font-semibold mb-2">赛车大师</h2>
+              <p className="text-gray-600 mb-4">体验极速竞速的快感，在各种赛道上展现你的驾驶技巧。</p>
+              <Link href="/games/2" className="block w-full text-center bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+                开始游戏
+              </Link>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <img src="/images/games/game3.jpg" alt="益智拼图" className="w-full h-48 object-cover" />
+            <div className="p-4">
+              <h2 className="text-xl font-semibold mb-2">益智拼图</h2>
+              <p className="text-gray-600 mb-4">考验智力的拼图游戏，通过移动方块来还原图片。</p>
+              <Link href="/games/3" className="block w-full text-center bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+                开始游戏
+              </Link>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer className="bg-white border-t mt-8">
+        <div className="container mx-auto px-4 py-6 text-center text-gray-600">
+          <p>&copy; 2024 Joy Grid. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  )
 } 
