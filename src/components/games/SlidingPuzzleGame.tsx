@@ -80,7 +80,10 @@ export default function SlidingPuzzleGame({ onComplete }: SlidingPuzzleGameProps
   const handleTileClick = (tile: Tile) => {
     if (gameState.isComplete) return;
 
-    if (isValidMove(gameState.emptyTilePosition, tile.currentPosition)) {
+    const { row: emptyRow, col: emptyCol } = gameState.emptyTilePosition;
+    const { row: tileRow, col: tileCol } = tile.currentPosition;
+
+    if (Math.abs(emptyRow - tileRow) + Math.abs(emptyCol - tileCol) === 1) {
       const newTiles = gameState.tiles.map(t => {
         if (t.id === tile.id) {
           return {
@@ -94,7 +97,7 @@ export default function SlidingPuzzleGame({ onComplete }: SlidingPuzzleGameProps
       const newState = {
         ...gameState,
         tiles: newTiles,
-        emptyTilePosition: { ...tile.currentPosition },
+        emptyTilePosition: tile.currentPosition,
         moves: gameState.moves + 1,
       };
 
@@ -121,20 +124,20 @@ export default function SlidingPuzzleGame({ onComplete }: SlidingPuzzleGameProps
       if (gameState.isComplete) return;
 
       const { row, col } = gameState.emptyTilePosition;
-      let newPosition;
+      let targetPosition;
 
       switch (e.key) {
         case 'ArrowUp':
-          newPosition = { row: row + 1, col };
+          targetPosition = { row: row - 1, col };
           break;
         case 'ArrowDown':
-          newPosition = { row: row - 1, col };
+          targetPosition = { row: row + 1, col };
           break;
         case 'ArrowLeft':
-          newPosition = { row, col: col + 1 };
+          targetPosition = { row, col: col - 1 };
           break;
         case 'ArrowRight':
-          newPosition = { row, col: col - 1 };
+          targetPosition = { row, col: col + 1 };
           break;
         default:
           return;
@@ -142,8 +145,8 @@ export default function SlidingPuzzleGame({ onComplete }: SlidingPuzzleGameProps
 
       const tileToMove = gameState.tiles.find(
         t =>
-          t.currentPosition.row === newPosition.row &&
-          t.currentPosition.col === newPosition.col
+          t.currentPosition.row === targetPosition.row &&
+          t.currentPosition.col === targetPosition.col
       );
 
       if (tileToMove) {
@@ -158,9 +161,9 @@ export default function SlidingPuzzleGame({ onComplete }: SlidingPuzzleGameProps
   return (
     <div className="w-full max-w-lg mx-auto px-4">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Sliding Puzzle</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">数字华容道</h1>
         <p className="text-white/90">
-          Arrange the numbers in order by sliding tiles into the empty space.
+          通过滑动方块，将数字按顺序排列。
         </p>
       </div>
 
@@ -175,7 +178,7 @@ export default function SlidingPuzzleGame({ onComplete }: SlidingPuzzleGameProps
                 : 'bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
-            {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+            {difficulty === 'easy' ? '3x3' : difficulty === 'medium' ? '4x4' : '5x5'}
           </button>
         ))}
       </div>
@@ -183,38 +186,41 @@ export default function SlidingPuzzleGame({ onComplete }: SlidingPuzzleGameProps
       <div className="mb-4 flex justify-center gap-8">
         <div className="bg-white rounded-lg px-4 py-2 text-center">
           <div className="text-2xl font-bold text-gray-900">{gameState.moves}</div>
-          <div className="text-sm text-gray-600">Moves</div>
+          <div className="text-sm text-gray-600">步数</div>
         </div>
         <div className="bg-white rounded-lg px-4 py-2 text-center">
           <div className="text-2xl font-bold text-gray-900">
             {formatTime(gameState.timeElapsed)}
           </div>
-          <div className="text-sm text-gray-600">Time</div>
+          <div className="text-sm text-gray-600">时间</div>
         </div>
         <div className="bg-white rounded-lg px-4 py-2 text-center">
           <div className="text-2xl font-bold text-gray-900">
             {bestScore ? bestScore : '-'}
           </div>
-          <div className="text-sm text-gray-600">Best Score</div>
+          <div className="text-sm text-gray-600">最高分</div>
         </div>
       </div>
 
-      <div className="relative aspect-square w-full bg-white rounded-xl shadow-lg overflow-hidden">
-        {gameState.tiles.map(tile => (
-          <button
-            key={tile.id}
-            onClick={() => handleTileClick(tile)}
-            className="absolute bg-gradient-to-br from-teal-400 to-blue-500 text-white text-2xl font-bold flex items-center justify-center rounded-lg shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50"
-            style={{
-              width: `${100 / gameState.gridSize}%`,
-              height: `${100 / gameState.gridSize}%`,
-              left: `${(tile.currentPosition.col * 100) / gameState.gridSize}%`,
-              top: `${(tile.currentPosition.row * 100) / gameState.gridSize}%`,
-            }}
-          >
-            {tile.value}
-          </button>
-        ))}
+      <div className="relative aspect-square w-full bg-white rounded-xl shadow-lg overflow-hidden p-2">
+        <div className="relative w-full h-full">
+          {gameState.tiles.map(tile => (
+            <button
+              key={tile.id}
+              onClick={() => handleTileClick(tile)}
+              className="absolute bg-gradient-to-br from-teal-400 to-blue-500 text-white text-2xl font-bold flex items-center justify-center rounded-lg shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50"
+              style={{
+                width: `${96 / gameState.gridSize}%`,
+                height: `${96 / gameState.gridSize}%`,
+                left: `${(tile.currentPosition.col * 96) / gameState.gridSize + 2}%`,
+                top: `${(tile.currentPosition.row * 96) / gameState.gridSize + 2}%`,
+                fontSize: `${24 / gameState.gridSize}rem`,
+              }}
+            >
+              {tile.value}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="mt-4 flex justify-center">
@@ -222,7 +228,7 @@ export default function SlidingPuzzleGame({ onComplete }: SlidingPuzzleGameProps
           onClick={initializeGame}
           className="px-6 py-2 bg-teal-500 text-white font-medium rounded-lg hover:bg-teal-600 transition-colors duration-200"
         >
-          New Game
+          重新开始
         </button>
       </div>
     </div>
