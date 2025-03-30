@@ -297,13 +297,15 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: white;
-            padding: 20px;
+            padding: 24px;
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             z-index: 1001;
             display: none;
             max-width: 90%;
             width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .share-preview.show {
             display: block;
@@ -313,11 +315,47 @@
             height: auto;
             border-radius: 8px;
             margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         .share-actions {
             display: flex;
+            flex-direction: column;
             gap: 12px;
+        }
+        .share-text {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-size: 14px;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+        .share-instructions {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .copy-button {
+            background: #4ECDC4;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
             justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .copy-button:hover {
+            background: #45B7AF;
+        }
+        .copy-button.copied {
+            background: #2ecc71;
         }
         @media (max-width: 640px) {
             .game-container {
@@ -346,6 +384,13 @@
             .win-message {
                 padding: 20px;
                 width: 95%;
+            }
+            .share-preview {
+                width: 95%;
+                padding: 16px;
+            }
+            .share-actions {
+                gap: 8px;
             }
         }
         @media (max-height: 700px) {
@@ -489,10 +534,24 @@
 
     <!-- Share Preview -->
     <div class="share-preview" id="sharePreview">
+        <div class="share-instructions">
+            保存图片并复制文本，然后手动分享到您的社交媒体
+        </div>
         <canvas id="shareCanvas"></canvas>
+        <div class="share-text" id="shareText"></div>
         <div class="share-actions">
-            <button class="game-button" onclick="downloadShareImage()">Download</button>
-            <button class="game-button share" onclick="shareWithFacebook()">Share</button>
+            <button class="game-button" onclick="downloadShareImage()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                保存图片
+            </button>
+            <button class="copy-button" onclick="copyShareText()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                复制分享文本
+            </button>
         </div>
     </div>
 
@@ -869,14 +928,14 @@
             }
         }, TOUCH_DEBOUNCE);
 
-        // Generate share image
+        // Generate share image with improved quality
         async function generateShareImage() {
             const canvas = document.getElementById('shareCanvas');
             const ctx = canvas.getContext('2d');
             
-            // 设置画布大小
-            canvas.width = 1200; // 增加分辨率
-            canvas.height = 630; // 优化为社交媒体推荐尺寸
+            // 设置画布大小为社交媒体推荐尺寸
+            canvas.width = 1200;
+            canvas.height = 630;
             
             // 绘制背景
             ctx.fillStyle = '#ffffff';
@@ -930,74 +989,52 @@
         async function shareScore() {
             const sharePreview = document.getElementById('sharePreview');
             const overlay = document.getElementById('overlay');
+            const shareText = document.getElementById('shareText');
             
             // 生成并显示预览
             await generateShareImage();
+            
+            // 更新分享文本
+            shareText.textContent = `🎮 我在Joy Game Grid完成了${gridSize}x${gridSize}的挑战，用了${moveCount}步和${document.getElementById('timer').textContent}！来挑战我吧：joy-grid.com`;
+            
             sharePreview.classList.add('show');
             overlay.classList.add('show');
         }
 
-        // Share with Facebook
-        async function shareWithFacebook() {
-            const shareText = `🎮 我在Joy Game Grid完成了${gridSize}x${gridSize}的挑战，用了${moveCount}步和${document.getElementById('timer').textContent}！来挑战我吧！`;
-            
-            if (typeof FB !== 'undefined') {
-                FB.ui({
-                    method: 'share',
-                    href: 'https://joy-grid.com',
-                    quote: shareText,
-                    hashtag: '#JoyGameGrid'
-                }, function(response) {
-                    if (response && !response.error_message) {
-                        showToast('分享成功！');
-                    }
-                });
-            } else {
-                // Fallback to Web Share API
-                await shareWithWebAPI();
-            }
-        }
-
-        // Share with Web Share API
-        async function shareWithWebAPI() {
-            const canvas = document.getElementById('shareCanvas');
-            const imageData = canvas.toDataURL('image/png');
-            
-            // 转换为Blob
-            const response = await fetch(imageData);
-            const blob = await response.blob();
-            
-            const file = new File([blob], 'joy-grid-score.png', { type: 'image/png' });
-            
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: 'Joy Game Grid Score',
-                        text: `🎮 我在Joy Game Grid完成了${gridSize}x${gridSize}的挑战，用了${moveCount}步和${document.getElementById('timer').textContent}！来挑战我吧：joy-grid.com`,
-                        files: [file]
-                    });
-                } catch (error) {
-                    console.error('分享失败:', error);
-                    // Fallback to download
-                    downloadShareImage();
-                }
-            } else {
-                // Fallback to download
-                downloadShareImage();
-            }
+        // Copy share text
+        function copyShareText() {
+            const shareText = document.getElementById('shareText').textContent;
+            navigator.clipboard.writeText(shareText).then(() => {
+                const button = document.querySelector('.copy-button');
+                button.classList.add('copied');
+                button.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    已复制
+                `;
+                
+                setTimeout(() => {
+                    button.classList.remove('copied');
+                    button.innerHTML = `
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                        </svg>
+                        复制分享文本
+                    `;
+                }, 2000);
+            }).catch(() => {
+                showToast('复制失败，请手动复制');
+            });
         }
 
         // Download share image
         function downloadShareImage() {
             const canvas = document.getElementById('shareCanvas');
             const link = document.createElement('a');
-            link.download = 'joy-grid-score.png';
+            link.download = `joy-grid-score-${gridSize}x${gridSize}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
-            
-            // 关闭预览
-            document.getElementById('sharePreview').classList.remove('show');
-            document.getElementById('overlay').classList.remove('show');
         }
 
         // Play sound
