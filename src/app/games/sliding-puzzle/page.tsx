@@ -1,12 +1,12 @@
 import React from 'react';
-import SlidingPuzzle from '@/components/games/SlidingPuzzle';
 import GameLayout from '@/components/layouts/GameLayout';
+import SlidingPuzzleGame from '@/components/games/SlidingPuzzleGame';
 
 export default function SlidingPuzzlePage() {
   return (
     <GameLayout>
-      <div className="container mx-auto min-h-screen py-8">
-        <SlidingPuzzle difficulty="medium" />
+      <div className="min-h-screen bg-gradient-to-br from-pink-400 to-blue-400 py-8">
+        <SlidingPuzzleGame />
       </div>
     </GameLayout>
   );

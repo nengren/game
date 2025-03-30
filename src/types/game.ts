@@ -62,19 +62,36 @@ export interface Game {
   };
 }
 
-export interface GameScore {
-  gameId: string;
-  playerId: string;
-  playerName: string;
-  score: number;
-  time: number;
+export interface Tile {
+  id: number;
+  value: number;
+  currentPosition: {
+    row: number;
+    col: number;
+  };
+  correctPosition: {
+    row: number;
+    col: number;
+  };
+}
+
+export interface GameState {
+  tiles: Tile[];
+  emptyTilePosition: {
+    row: number;
+    col: number;
+  };
   moves: number;
-  difficulty: string;
+  timeElapsed: number;
+  isComplete: boolean;
+  gridSize: number;
+}
+
+export interface GameScore {
+  moves: number;
+  time: number;
   date: string;
-  platform: string;
-  device: string;
-  browser: string;
-  isVerified: boolean;
+  difficulty: string;
 }
 
 export interface GameAchievement {
@@ -96,25 +113,17 @@ export interface GameLeaderboard {
   lastUpdated: string;
 }
 
-export interface GameState {
-  isPlaying: boolean;
-  isPaused: boolean;
-  isGameOver: boolean;
-  score: number;
-  time: number;
-  moves: number;
-  difficulty: string;
-  soundEnabled: boolean;
-  musicEnabled: boolean;
-  tutorialShown: boolean;
-  achievements: GameAchievement[];
-  currentLevel: number;
-  lives: number;
-  powerUps: string[];
-  settings: {
-    volume: number;
-    language: string;
-    theme: string;
-    controls: string;
-  };
+export interface GameSettings {
+  difficulty: 'easy' | 'medium' | 'hard';
+  isSoundEnabled: boolean;
+  isTimerEnabled: boolean;
+}
+
+export interface GameStats {
+  bestScore: number;
+  bestTime: number;
+  totalGames: number;
+  totalMoves: number;
+  totalTime: number;
+  winRate: number;
 } 
